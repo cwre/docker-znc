@@ -1,5 +1,5 @@
 FROM lsiobase/alpine:3.6
-MAINTAINER sparklyballs
+MAINTAINER cwre
 
 # set version label
 ARG BUILD_DATE
@@ -28,6 +28,7 @@ RUN \
 	python3-dev \
 	swig \
 	tar \
+	ca-certificates \
 	tcl-dev && \
 
 # fetch and unpack source
@@ -65,6 +66,12 @@ RUN \
  make && \
  make install && \
 
+# compile znc-push
+ git clone https://github.com/jreese/znc-push.git /tmp/znc-push && \
+ cd /tmp/znc-push && \
+ make && \
+ /usr/bin/install -c -m 644 push.so /usr/lib/znc/ && \ 
+
 # determine build packages to keep
  RUNTIME_PACKAGES="$( \
 	scanelf --needed --nobanner /usr/bin/znc \
@@ -87,5 +94,6 @@ RUN \
 COPY /root /
 
 # ports and volumes
-EXPOSE 6501
+EXPOSE 5444
+EXPOSE 5443
 VOLUME /config
